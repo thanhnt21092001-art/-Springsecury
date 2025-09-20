@@ -26,6 +26,7 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(String username) {
+
         String userName= getUserNameData(username);
         User user = userRepository.findByUsername(userName).orElseThrow();
         if (!user.isEnabled()) {

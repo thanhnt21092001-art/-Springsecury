@@ -7,19 +7,17 @@ import com.example.demo.ServiceImpl.UserDetailService;
 import com.example.demo.config.JwtTokenProvider;
 import com.example.demo.dto.ChangePassSetRoleAdmin;
 import com.example.demo.dto.ChangePasswordRequest;
-import com.google.gson.Gson;
+import com.example.demo.dto.LoginDTO;
+import com.example.demo.dto.RegisterDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,7 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User request) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO request) {
         Map<String, String> map = new HashMap<>();
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -73,10 +71,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User request) {
+    public ResponseEntity<?> registerUser(@RequestBody RegisterDTO request) {
         HashMap<Object, String> map = new HashMap<>();
         try {
-            userSerVice.registerUser(request);
+            User user = new User();
+            user.setUsername(request.getUsername());
+            user.setPassword(request.getPassword());
+            userSerVice.registerUser(user);
             map.put("status", "success");
             map.put("Code", String.valueOf(HttpServletResponse.SC_OK));
             return ResponseEntity.ok(map);
@@ -150,6 +151,7 @@ public class AuthController {
         map.put("message", message);
         return ResponseEntity.ok(map);
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ("/changePassUser")
     public ResponseEntity<?> changePassUser(@RequestBody ChangePassSetRoleAdmin request) {
