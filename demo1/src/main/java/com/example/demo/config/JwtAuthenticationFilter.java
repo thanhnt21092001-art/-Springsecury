@@ -86,12 +86,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-
         Map<String, Object> error = new HashMap<>();
         error.put("status", "error");
         error.put("code", "401");
         error.put("message", message);
-
         ObjectMapper mapper = new ObjectMapper();
         response.getWriter().write(mapper.writeValueAsString(error));
     }

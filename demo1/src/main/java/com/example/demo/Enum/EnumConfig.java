@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum EnumConfig {
-    PASSWORD_CHANGE_SUCCESS, LOGIN_FAIL;
+    PASSWORD_CHANGE_SUCCESS, LOGIN_FAIL,VALIDATE;
 
 
     private static final Map<EnumConfig, String> messages = new HashMap<>();
@@ -12,6 +12,7 @@ public enum EnumConfig {
     static {
         messages.put(PASSWORD_CHANGE_SUCCESS, "Thay đổi mật khẩu thành công");
         messages.put(LOGIN_FAIL, "Đăng nhập thất bại");
+        messages.put(VALIDATE,"Vui lòng nhập đầy đủ thông tin");
     }
 
     public String getText() {

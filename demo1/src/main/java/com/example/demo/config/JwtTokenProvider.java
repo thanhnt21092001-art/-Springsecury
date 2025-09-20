@@ -1,11 +1,13 @@
 package com.example.demo.config;
 
 import com.example.demo.Entities.User;
+import com.example.demo.Enum.EnumConfig;
 import com.example.demo.Repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
+
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -21,13 +23,13 @@ public class JwtTokenProvider {
     private final UserRepository userRepository;
     private final long validityInMs = 3600000; // 1 giờ
     Logger logger = Logger.getLogger(JwtTokenProvider.class.getName());
+
     public JwtTokenProvider(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     public String generateToken(String username) {
-
-        String userName= getUserNameData(username);
+        String userName = getUserNameData(username);
         User user = userRepository.findByUsername(userName).orElseThrow();
         if (!user.isEnabled()) {
             throw new RuntimeException("Tài khoản đã bị thu hồi");
@@ -35,12 +37,12 @@ public class JwtTokenProvider {
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + validityInMs);
-            return Jwts.builder()
-                    .setSubject(username)
-                    .setIssuedAt(now)
-                    .setExpiration(expiry)
-                    .signWith(key)
-                    .compact();
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(key)
+                .compact();
 
 
     }
@@ -83,7 +85,7 @@ public class JwtTokenProvider {
                 .toLocalDateTime(); // Chuyển sang LocalDateTime
     }
 
-    private String getUserNameData(String input){
+    private String getUserNameData(String input) {
 
         Pattern pattern = Pattern.compile("Username=([^,\\]]+)");
         Matcher matcher = pattern.matcher(input);
@@ -94,6 +96,6 @@ public class JwtTokenProvider {
         } else {
             logger.info("Không tìm thấy Username");
         }
-        return  username;
+        return username;
     }
 }

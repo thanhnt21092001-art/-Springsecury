@@ -1,6 +1,7 @@
 package com.example.demo.ServiceImpl;
 
 import com.example.demo.Entities.User;
+import com.example.demo.Enum.EnumConfig;
 import com.example.demo.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,16 +24,19 @@ public class UserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        if ("".equals(username) || username == null) {
+            throw new RuntimeException(EnumConfig.VALIDATE.getText());
+        }
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-            if (user.getDate_end() != null && user.getDate_end().before(new Date())) {
-                try {
-                    throw new AccountExpiredException("Tài khoản đã hết hạn");
-                } catch (AccountExpiredException e) {
-                    throw new RuntimeException(e);
-                }
+        if (user.getDate_end() != null && user.getDate_end().before(new Date())) {
+            try {
+                throw new AccountExpiredException("Tài khoản đã hết hạn");
+            } catch (AccountExpiredException e) {
+                throw new RuntimeException(e);
             }
+        }
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())

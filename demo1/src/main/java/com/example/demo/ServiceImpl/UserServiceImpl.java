@@ -32,10 +32,12 @@ public class UserServiceImpl implements UserSerVice {
     }
 
     public User registerUser(User request) {
+        if ("".equals(request.getPassword()) || "".equals(request.getUsername())) {
+            throw  new RuntimeException("invalid password or username");
+        }
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username đã tồn tại");
         }
-
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
