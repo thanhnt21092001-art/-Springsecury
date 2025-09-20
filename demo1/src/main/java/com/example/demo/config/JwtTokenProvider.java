@@ -2,7 +2,6 @@ package com.example.demo.config;
 
 import com.example.demo.Entities.User;
 import com.example.demo.Repository.UserRepository;
-import com.google.gson.Gson;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +10,6 @@ import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
