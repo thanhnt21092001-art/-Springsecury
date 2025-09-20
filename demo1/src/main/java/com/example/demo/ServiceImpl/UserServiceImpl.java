@@ -1,20 +1,17 @@
 package com.example.demo.ServiceImpl;
 
 import com.example.demo.Entities.User;
+import com.example.demo.Enum.EnumConfig;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.UserSerVice;
 import com.example.demo.dto.ChangePassSetRoleAdmin;
 import com.example.demo.dto.ChangePasswordRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +21,7 @@ public class UserServiceImpl implements UserSerVice {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
 
     public void UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -78,7 +76,7 @@ public class UserServiceImpl implements UserSerVice {
         // Đổi mật khẩu và lưu lại
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
-        return "Thay đổi mật khẩu thành công";
+        return EnumConfig.PASSWORD_CHANGE_SUCCESS.getText();
     }
 
     @Override
@@ -87,7 +85,7 @@ public class UserServiceImpl implements UserSerVice {
         User user = optionalUser.get();
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
-        return "Thay đổi mật khẩu thành công";
+        return EnumConfig.PASSWORD_CHANGE_SUCCESS.getText();
     }
 
 
