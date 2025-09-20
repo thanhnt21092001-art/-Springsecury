@@ -3,6 +3,7 @@ package com.example.demo.ServiceImpl;
 import com.example.demo.Entities.User;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.UserSerVice;
+import com.example.demo.dto.ChangePassSetRoleAdmin;
 import com.example.demo.dto.ChangePasswordRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,9 +12,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -40,6 +42,8 @@ public class UserServiceImpl implements UserSerVice {
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole("USER");
+        user.setCreate_date(new Date(System.currentTimeMillis()));
+        user.setDate_end(Date.valueOf(LocalDate.now().plusDays(30)));
         user.setEnabled(true);// default role
         return userRepository.save(user);
     }
@@ -72,6 +76,15 @@ public class UserServiceImpl implements UserSerVice {
         }
 
         // Đổi mật khẩu và lưu lại
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return "Thay đổi mật khẩu thành công";
+    }
+
+    @Override
+    public String changePasswordByUserName(ChangePassSetRoleAdmin request) {
+        Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
+        User user = optionalUser.get();
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
         return "Thay đổi mật khẩu thành công";

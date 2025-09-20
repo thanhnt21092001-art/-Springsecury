@@ -5,6 +5,7 @@ import com.example.demo.Service.TokenBlacklistService;
 import com.example.demo.Service.UserSerVice;
 import com.example.demo.ServiceImpl.UserDetailService;
 import com.example.demo.config.JwtTokenProvider;
+import com.example.demo.dto.ChangePassSetRoleAdmin;
 import com.example.demo.dto.ChangePasswordRequest;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
@@ -143,6 +144,16 @@ public class AuthController {
     @PostMapping ("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         String message = userSerVice.changePassword(request);
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", "success");
+        map.put("code", HttpServletResponse.SC_OK);
+        map.put("message", message);
+        return ResponseEntity.ok(map);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping ("/changePassUser")
+    public ResponseEntity<?> changePassUser(@RequestBody ChangePassSetRoleAdmin request) {
+        String message = userSerVice.changePasswordByUserName(request);
         Map<String, Object> map = new HashMap<>();
         map.put("status", "success");
         map.put("code", HttpServletResponse.SC_OK);

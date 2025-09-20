@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Date;
+
 
 @Entity
 @Data
@@ -24,5 +26,10 @@ public class User {
     private String role;
     @Column(nullable = false)
     private boolean enabled;
+    @Column(unique = true)
+    private Date date_end ;
+
+    @Column(unique = true)
+    private Date create_date;
 
 }

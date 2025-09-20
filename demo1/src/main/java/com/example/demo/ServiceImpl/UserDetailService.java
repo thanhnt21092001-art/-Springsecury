@@ -8,6 +8,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.login.AccountExpiredException;
+import java.util.Date;
+
+
 @Service
 public class UserDetailService implements UserDetailsService {
     @Autowired
@@ -22,10 +26,20 @@ public class UserDetailService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
+            if (user.getDate_end() != null && user.getDate_end().before(new Date())) {
+                try {
+                    throw new AccountExpiredException("Tài khoản đã hết hạn");
+                } catch (AccountExpiredException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword()) // password phải được mã hóa (BCrypt)
                 .roles(user.getRole()) // giả sử user có trường role là String
                 .build();
     }
+
+
 }

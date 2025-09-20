@@ -1,6 +1,7 @@
 package com.example.demo.Service;
 
 import com.example.demo.Entities.User;
+import com.example.demo.dto.ChangePassSetRoleAdmin;
 import com.example.demo.dto.ChangePasswordRequest;
 import org.springframework.stereotype.Service;
 
@@ -13,4 +14,6 @@ public interface UserSerVice  {
     User registerUser(User request);
     void SaveOrUpdate(Long id , Boolean enalbe);
     String changePassword(ChangePasswordRequest request);
+
+    String changePasswordByUserName(ChangePassSetRoleAdmin request);
 }

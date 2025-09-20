@@ -52,6 +52,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/api/auth/lockAndUnlock").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/auth/getAll").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/auth/changePassUser").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/auth/logout").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                         .requestMatchers("/api/auth/change-password").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                         .anyRequest().authenticated()
