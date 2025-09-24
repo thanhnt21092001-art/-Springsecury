@@ -1,7 +1,6 @@
 package com.example.demo.config;
 
 import com.example.demo.Entities.User;
-import com.example.demo.Enum.EnumConfig;
 import com.example.demo.Repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

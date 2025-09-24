@@ -1,0 +1,59 @@
+package com.example.demo.Controller;
+
+import com.example.demo.Entities.FileBase;
+import com.example.demo.Service.FileBaseSerVice;
+import com.google.cloud.storage.Blob;
+import com.google.firebase.cloud.StorageClient;
+import com.google.gson.Gson;
+import jakarta.servlet.http.HttpServletResponse;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.net.URL;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+@RestController
+@RequestMapping("/api/files")
+public class UploadFileController {
+    @Autowired
+    private FileBaseSerVice fileBaseSerVice;
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            // Upload file vào Firebase Storage
+            Blob blob = StorageClient.getInstance().bucket().create(
+                    "uploads/" + file.getOriginalFilename(),
+                    file.getInputStream(),
+                    file.getContentType()
+            );
+            FileBase fileBase = new FileBase();
+            // Tạo link tải (signed URL, có hạn 7 ngày)
+            URL url = StorageClient.getInstance().bucket().getStorage()
+                    .signUrl(blob, 7, TimeUnit.DAYS);
+            fileBase.setFilePath(url.toString());
+            fileBase.setFileName(file.getOriginalFilename());
+            fileBase.setFileType(file.getContentType());
+            fileBase.setFileSize(String.valueOf(file.getSize()));
+            fileBase.setDateUpload(new Date());
+            Gson gson = new Gson();
+            System.out.println("data "+gson.toJson(fileBase));
+            fileBaseSerVice.Save(fileBase);
+            Map<String, Object> map = new HashMap<>();
+            map.put("Code", HttpServletResponse.SC_OK);
+            map.put("Message", "Tải tài liệu thành công");
+            return ResponseEntity.ok(map);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Upload error: " + e.getMessage());
+        }
+    }
+}

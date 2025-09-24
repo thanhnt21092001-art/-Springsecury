@@ -126,10 +126,10 @@ public class AuthController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/lockAndUnlock")
-    public ResponseEntity<?> lockAndUnlock(@RequestParam Long id, @RequestParam Boolean enalbe) {
-        userSerVice.SaveOrUpdate(id, enalbe);
+    public ResponseEntity<?> lockAndUnlock(@RequestParam Long id, @RequestParam Boolean enable) {
+        userSerVice.SaveOrUpdate(id, enable);
         Map<String, Object> map = new HashMap<>();
-        if (enalbe) {
+        if (enable) {
             map.put("status", "success");
             map.put("code", HttpServletResponse.SC_OK);
             map.put("message", "Mở khoá thành công");
