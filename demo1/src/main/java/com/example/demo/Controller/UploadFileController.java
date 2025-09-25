@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,8 +25,7 @@ public class UploadFileController {
     private FileBaseSerVice fileBaseSerVice;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
             // Upload file vào Firebase Storage
             Blob blob = StorageClient.getInstance().bucket().create(
                     "uploads/" + file.getOriginalFilename(),
@@ -40,16 +40,11 @@ public class UploadFileController {
             fileBase.setFileType(file.getContentType());
             fileBase.setFileSize(String.valueOf(file.getSize()));
             fileBase.setDateUpload(new Date());
-            Gson gson = new Gson();
-            System.out.println("data " + gson.toJson(fileBase));
             fileBaseSerVice.Save(fileBase);
             Map<String, Object> map = new HashMap<>();
             map.put("Code", HttpServletResponse.SC_OK);
             map.put("Message", "Tải tài liệu thành công");
             return ResponseEntity.ok(map);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Upload error: " + e.getMessage());
-        }
     }
 
     @DeleteMapping("/delete/{id}")

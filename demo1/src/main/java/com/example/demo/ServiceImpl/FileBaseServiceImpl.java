@@ -8,8 +8,6 @@ import com.google.cloud.storage.Storage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-
 @Service
 public class FileBaseServiceImpl implements FileBaseSerVice {
     @Autowired
@@ -33,7 +31,6 @@ public class FileBaseServiceImpl implements FileBaseSerVice {
             String objectName = "uploads/"+fileBase.getFileName();
             BlobId blobId = BlobId.of(bucketName, objectName);
             storage.delete(blobId);
-            System.out.println(blobId);
             storage.delete(blobId);
             fileBaseReposity.deleteById(Math.toIntExact(id));
     }
