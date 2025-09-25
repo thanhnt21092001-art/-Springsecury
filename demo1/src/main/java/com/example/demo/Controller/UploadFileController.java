@@ -6,13 +6,9 @@ import com.google.cloud.storage.Blob;
 import com.google.firebase.cloud.StorageClient;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletResponse;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URL;
@@ -37,7 +33,6 @@ public class UploadFileController {
                     file.getContentType()
             );
             FileBase fileBase = new FileBase();
-            // Tạo link tải (signed URL, có hạn 7 ngày)
             URL url = StorageClient.getInstance().bucket().getStorage()
                     .signUrl(blob, 7, TimeUnit.DAYS);
             fileBase.setFilePath(url.toString());
@@ -46,7 +41,7 @@ public class UploadFileController {
             fileBase.setFileSize(String.valueOf(file.getSize()));
             fileBase.setDateUpload(new Date());
             Gson gson = new Gson();
-            System.out.println("data "+gson.toJson(fileBase));
+            System.out.println("data " + gson.toJson(fileBase));
             fileBaseSerVice.Save(fileBase);
             Map<String, Object> map = new HashMap<>();
             map.put("Code", HttpServletResponse.SC_OK);
@@ -56,4 +51,16 @@ public class UploadFileController {
             return ResponseEntity.status(500).body("Upload error: " + e.getMessage());
         }
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteFile(@PathVariable Long id) {
+        Map<String, Object> map = new HashMap<>();
+        fileBaseSerVice.deleteFileInDB(id);
+        map.put("Code", HttpServletResponse.SC_OK);
+        map.put("message", "Delete file successfully");
+        return ResponseEntity.ok(map);
+
+    }
+
+
 }

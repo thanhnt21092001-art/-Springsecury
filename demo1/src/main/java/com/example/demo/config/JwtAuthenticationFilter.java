@@ -70,6 +70,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (RuntimeException e) {
             handleUnauthorizedResponse(response, "Authentication failed: " + e.getMessage());
+        } catch (Exception e) {
+            handleInternalServerError(response,e.getMessage());
         }
 
     }
@@ -90,6 +92,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         error.put("status", "error");
         error.put("code", "401");
         error.put("message", message);
+        ObjectMapper mapper = new ObjectMapper();
+        response.getWriter().write(mapper.writeValueAsString(error));
+    }
+
+    private void handleInternalServerError(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // 500
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        Map<String, Object> error = new HashMap<>();
+        error.put("status", "error");
+        error.put("code", "500");
+        error.put("message", message);
+
         ObjectMapper mapper = new ObjectMapper();
         response.getWriter().write(mapper.writeValueAsString(error));
     }

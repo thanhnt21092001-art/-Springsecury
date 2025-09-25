@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FileBaseReposity extends JpaRepository<FileBase, Integer> {
 
+    Integer id(Long id);
 }
