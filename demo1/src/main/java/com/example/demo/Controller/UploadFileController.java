@@ -4,7 +4,6 @@ import com.example.demo.Entities.FileBase;
 import com.example.demo.Service.FileBaseSerVice;
 import com.google.cloud.storage.Blob;
 import com.google.firebase.cloud.StorageClient;
-import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +39,8 @@ public class UploadFileController {
             fileBase.setFileType(file.getContentType());
             fileBase.setFileSize(String.valueOf(file.getSize()));
             fileBase.setDateUpload(new Date());
+            System.out.println("idFile "+ blob.getGeneratedId());
+            fileBase.setFileId(blob.getGeneratedId());
             fileBaseSerVice.Save(fileBase);
             Map<String, Object> map = new HashMap<>();
             map.put("Code", HttpServletResponse.SC_OK);

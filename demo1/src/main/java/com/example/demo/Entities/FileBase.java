@@ -27,6 +27,8 @@ public class FileBase {
     private String filePath;
     @Column(nullable = false)
     private Date dateUpload;
+    @Column(nullable = false)
+    private String fileId ;
 
 
 }
