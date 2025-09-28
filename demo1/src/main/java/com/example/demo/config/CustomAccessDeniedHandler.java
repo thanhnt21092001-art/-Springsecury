@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 
+import com.example.demo.Enum.EnumConfig;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +18,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
         response.setContentType("application/json;charset=UTF-8");
         HashMap<String, Object> map = new HashMap<>();
-        map.put("message", "Access Denied");
+        map.put("message", EnumConfig.ACCESS_DENIED);
         map.put("status", HttpServletResponse.SC_FORBIDDEN);
         Gson gson = new Gson();
         String json = gson.toJson(map);

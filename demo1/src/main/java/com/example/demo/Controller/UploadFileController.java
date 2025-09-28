@@ -39,7 +39,6 @@ public class UploadFileController {
             fileBase.setFileType(file.getContentType());
             fileBase.setFileSize(String.valueOf(file.getSize()));
             fileBase.setDateUpload(new Date());
-            System.out.println("idFile "+ blob.getGeneratedId());
             fileBase.setFileId(blob.getGeneratedId());
             fileBaseSerVice.Save(fileBase);
             Map<String, Object> map = new HashMap<>();

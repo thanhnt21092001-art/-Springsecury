@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import com.example.demo.Entities.User;
+import com.example.demo.Enum.EnumConfig;
 import com.example.demo.Repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -31,7 +32,7 @@ public class JwtTokenProvider {
         String userName = getUserNameData(username);
         User user = userRepository.findByUsername(userName).orElseThrow();
         if (!user.isEnabled()) {
-            throw new RuntimeException("Tài khoản đã bị thu hồi");
+            throw new RuntimeException(EnumConfig.TOKEN_RECALL.getText());
         }
 
         Date now = new Date();
@@ -54,7 +55,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (RuntimeException e) {
-            throw new RuntimeException("invalid token");
+            throw new RuntimeException(EnumConfig.INVALID_TOKEN.getText());
         }
     }
 
@@ -65,7 +66,7 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        if (bearerToken != null && bearerToken.startsWith("Bearer")) {
             return bearerToken.substring(7); // Bỏ "Bearer " để lấy phần token
         }
         return null;

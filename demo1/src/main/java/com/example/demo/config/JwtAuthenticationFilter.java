@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.Enum.EnumConfig;
 import com.example.demo.Service.TokenBlacklistService;
 import com.example.demo.ServiceImpl.UserDetailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 if (tokenBlacklistService.isTokenBlacklisted(token)) {
-                    handleUnauthorizedResponse(response, "Token đã bị thu hồi. Vui lòng đăng nhập lại");
+                    handleUnauthorizedResponse(response, EnumConfig.TOKEN_RECALL.getText());
                     return;
                 }
                 String input = jwtTokenProvider.getUsernameFromToken(token);
@@ -66,12 +67,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 filterChain.doFilter(request, response);
             } else {
-                handleUnauthorizedResponse(response, "Invalid or missing token");
+                handleUnauthorizedResponse(response, EnumConfig.TOKEN_FAIL.getText());
             }
         } catch (RuntimeException e) {
-            handleUnauthorizedResponse(response, "Authentication failed: " + e.getMessage());
+            handleUnauthorizedResponse(response, EnumConfig.LOGIN_FAIL.getText() + e.getMessage());
         } catch (Exception e) {
-            handleInternalServerError(response,e.getMessage());
+            handleInternalServerError(response, e.getMessage());
         }
 
     }
@@ -89,8 +90,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         Map<String, Object> error = new HashMap<>();
-        error.put("status", "error");
-        error.put("code", "401");
+        error.put("status", EnumConfig.ERROR);
+        error.put("code", HttpServletResponse.SC_UNAUTHORIZED);
         error.put("message", message);
         ObjectMapper mapper = new ObjectMapper();
         response.getWriter().write(mapper.writeValueAsString(error));
@@ -102,8 +103,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setCharacterEncoding("UTF-8");
 
         Map<String, Object> error = new HashMap<>();
-        error.put("status", "error");
-        error.put("code", "500");
+        error.put("status", EnumConfig.ERROR);
+        error.put("code", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         error.put("message", message);
 
         ObjectMapper mapper = new ObjectMapper();

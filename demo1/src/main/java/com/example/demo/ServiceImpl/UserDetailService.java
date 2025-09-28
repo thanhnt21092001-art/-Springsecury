@@ -28,11 +28,11 @@ public class UserDetailService implements UserDetailsService {
             throw new RuntimeException(EnumConfig.VALIDATE.getText());
         }
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> new RuntimeException(EnumConfig.NOT_FOUND_USER.getText()));
 
         if (user.getDate_end() != null && user.getDate_end().before(new Date())) {
             try {
-                throw new AccountExpiredException("Tài khoản đã hết hạn");
+                throw new AccountExpiredException(EnumConfig.USER_EXPIRED.getText());
             } catch (AccountExpiredException e) {
                 throw new RuntimeException(e);
             }

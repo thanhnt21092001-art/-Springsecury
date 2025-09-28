@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Entities.User;
+import com.example.demo.Enum.EnumConfig;
 import com.example.demo.Service.TokenBlacklistService;
 import com.example.demo.Service.UserSerVice;
 import com.example.demo.ServiceImpl.UserDetailService;
@@ -72,18 +73,18 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterDTO request) {
-        HashMap<Object, String> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         try {
             User user = new User();
             user.setUsername(request.getUsername());
             user.setPassword(request.getPassword());
             userSerVice.registerUser(user);
-            map.put("status", "success");
-            map.put("Code", String.valueOf(HttpServletResponse.SC_OK));
+            map.put("status", EnumConfig.SUCCESS);
+            map.put("Code", HttpServletResponse.SC_OK);
             return ResponseEntity.ok(map);
         } catch (RuntimeException e) {
-            map.put("status", "fail");
-            map.put("Code", String.valueOf(HttpServletResponse.SC_BAD_REQUEST));
+            map.put("status", EnumConfig.FAIL);
+            map.put("Code", HttpServletResponse.SC_BAD_REQUEST);
             map.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(map);
         }
@@ -102,7 +103,7 @@ public class AuthController {
             hashMap.put("role", user.getRole());
             list.add(hashMap);
         }
-        map.put("status", "success");
+        map.put("status", EnumConfig.SUCCESS);
         map.put("Code", HttpServletResponse.SC_OK);
         map.put("data", list);
         return ResponseEntity.ok(map);
@@ -118,9 +119,9 @@ public class AuthController {
             tokenBlacklistService.blacklistToken(token, expiry);
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("status", "success");
+        map.put("status", EnumConfig.SUCCESS);
         map.put("code", HttpServletResponse.SC_OK);
-        map.put("message", "Đăng xuất thành công");
+        map.put("message", EnumConfig.LOGOUT_MESSAGE);
         return ResponseEntity.ok(map);
     }
 
@@ -130,34 +131,34 @@ public class AuthController {
         userSerVice.SaveOrUpdate(id, enable);
         Map<String, Object> map = new HashMap<>();
         if (enable) {
-            map.put("status", "success");
+            map.put("status", EnumConfig.SUCCESS);
             map.put("code", HttpServletResponse.SC_OK);
-            map.put("message", "Mở khoá thành công");
+            map.put("message", EnumConfig.LOCK);
         } else {
-            map.put("status", "success");
+            map.put("status", EnumConfig.SUCCESS);
             map.put("code", HttpServletResponse.SC_OK);
-            map.put("message", "Khóa thành công");
+            map.put("message", EnumConfig.UNLOCK);
         }
         return ResponseEntity.ok(map);
     }
 
 
-    @PostMapping ("/change-password")
+    @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         String message = userSerVice.changePassword(request);
         Map<String, Object> map = new HashMap<>();
-        map.put("status", "success");
+        map.put("status", EnumConfig.SUCCESS);
         map.put("code", HttpServletResponse.SC_OK);
         map.put("message", message);
         return ResponseEntity.ok(map);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping ("/changePassUser")
+    @PostMapping("/changePassUser")
     public ResponseEntity<?> changePassUser(@RequestBody ChangePassSetRoleAdmin request) {
         String message = userSerVice.changePasswordByUserName(request);
         Map<String, Object> map = new HashMap<>();
-        map.put("status", "success");
+        map.put("status", EnumConfig.SUCCESS);
         map.put("code", HttpServletResponse.SC_OK);
         map.put("message", message);
         return ResponseEntity.ok(map);
