@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Entities.FileBase;
+import com.example.demo.Enum.EnumConfig;
 import com.example.demo.Service.FileBaseSerVice;
 import com.google.cloud.storage.Blob;
 import com.google.firebase.cloud.StorageClient;
@@ -43,7 +44,7 @@ public class UploadFileController {
             fileBaseSerVice.Save(fileBase);
             Map<String, Object> map = new HashMap<>();
             map.put("Code", HttpServletResponse.SC_OK);
-            map.put("Message", "Tải tài liệu thành công");
+            map.put("Message", EnumConfig.MESSAGE_UPLOAD_FILE.getText());
             return ResponseEntity.ok(map);
     }
 
@@ -52,7 +53,7 @@ public class UploadFileController {
         Map<String, Object> map = new HashMap<>();
         fileBaseSerVice.deleteFileInDB(id);
         map.put("Code", HttpServletResponse.SC_OK);
-        map.put("message", "Delete file successfully");
+        map.put("message", EnumConfig.MESSAGE_DELETE_FILE.getText());
         return ResponseEntity.ok(map);
 
     }

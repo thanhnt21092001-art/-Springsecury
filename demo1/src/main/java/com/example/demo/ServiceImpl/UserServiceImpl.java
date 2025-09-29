@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserSerVice {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER");
+        user.setRole(EnumConfig.ROLE_USER.getText());
         user.setCreate_date(new Date(System.currentTimeMillis()));
         user.setDate_end(Date.valueOf(LocalDate.now().plusDays(30)));
         user.setEnabled(true);// default role

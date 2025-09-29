@@ -63,7 +63,7 @@ public class AuthController {
             map.put("token", token);
             return ResponseEntity.ok(map);
         } catch (RuntimeException e) {
-            map.put("error", "fail");
+            map.put("error", EnumConfig.ERROR.getText());
             map.put("message", e.getMessage());
             map.put("code", String.valueOf(HttpServletResponse.SC_BAD_REQUEST));
             return ResponseEntity.badRequest().body(map);
@@ -79,11 +79,11 @@ public class AuthController {
             user.setUsername(request.getUsername());
             user.setPassword(request.getPassword());
             userSerVice.registerUser(user);
-            map.put("status", EnumConfig.SUCCESS);
+            map.put("status", EnumConfig.SUCCESS.getText());
             map.put("Code", HttpServletResponse.SC_OK);
             return ResponseEntity.ok(map);
         } catch (RuntimeException e) {
-            map.put("status", EnumConfig.FAIL);
+            map.put("status", EnumConfig.FAIL.getText());
             map.put("Code", HttpServletResponse.SC_BAD_REQUEST);
             map.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(map);
@@ -103,7 +103,7 @@ public class AuthController {
             hashMap.put("role", user.getRole());
             list.add(hashMap);
         }
-        map.put("status", EnumConfig.SUCCESS);
+        map.put("status", EnumConfig.SUCCESS.getText());
         map.put("Code", HttpServletResponse.SC_OK);
         map.put("data", list);
         return ResponseEntity.ok(map);
@@ -119,9 +119,9 @@ public class AuthController {
             tokenBlacklistService.blacklistToken(token, expiry);
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("status", EnumConfig.SUCCESS);
+        map.put("status", EnumConfig.SUCCESS.getText());
         map.put("code", HttpServletResponse.SC_OK);
-        map.put("message", EnumConfig.LOGOUT_MESSAGE);
+        map.put("message", EnumConfig.LOGOUT_MESSAGE.getText());
         return ResponseEntity.ok(map);
     }
 
@@ -131,11 +131,11 @@ public class AuthController {
         userSerVice.SaveOrUpdate(id, enable);
         Map<String, Object> map = new HashMap<>();
         if (enable) {
-            map.put("status", EnumConfig.SUCCESS);
+            map.put("status", EnumConfig.SUCCESS.getText());
             map.put("code", HttpServletResponse.SC_OK);
             map.put("message", EnumConfig.LOCK);
         } else {
-            map.put("status", EnumConfig.SUCCESS);
+            map.put("status", EnumConfig.SUCCESS.getText());
             map.put("code", HttpServletResponse.SC_OK);
             map.put("message", EnumConfig.UNLOCK);
         }
@@ -147,7 +147,7 @@ public class AuthController {
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         String message = userSerVice.changePassword(request);
         Map<String, Object> map = new HashMap<>();
-        map.put("status", EnumConfig.SUCCESS);
+        map.put("status", EnumConfig.SUCCESS.getText());
         map.put("code", HttpServletResponse.SC_OK);
         map.put("message", message);
         return ResponseEntity.ok(map);
@@ -158,7 +158,7 @@ public class AuthController {
     public ResponseEntity<?> changePassUser(@RequestBody ChangePassSetRoleAdmin request) {
         String message = userSerVice.changePasswordByUserName(request);
         Map<String, Object> map = new HashMap<>();
-        map.put("status", EnumConfig.SUCCESS);
+        map.put("status", EnumConfig.SUCCESS.getText());
         map.put("code", HttpServletResponse.SC_OK);
         map.put("message", message);
         return ResponseEntity.ok(map);
