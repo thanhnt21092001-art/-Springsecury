@@ -33,10 +33,10 @@ public class UserServiceImpl implements UserSerVice {
 
     public User registerUser(User request) {
         if ("".equals(request.getPassword()) || "".equals(request.getUsername())) {
-            throw  new RuntimeException("invalid password or username");
+            throw  new RuntimeException(EnumConfig.INVALID_USER_PASS.getText());
         }
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username đã tồn tại");
+            throw new RuntimeException(EnumConfig.NOT_FOUND_USER.getText());
         }
         User user = new User();
         user.setUsername(request.getUsername());
@@ -65,14 +65,14 @@ public class UserServiceImpl implements UserSerVice {
         Optional<User> optionalUser = userRepository.findByUsername(username);
 
         if (optionalUser.isEmpty()) {
-            throw new RuntimeException("User not found");
+            throw new RuntimeException(EnumConfig.NOT_FOUND_USER.getText());
         }
 
         User user = optionalUser.get();
 
         // Kiểm tra mật khẩu hiện tại
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new RuntimeException("Đổi mật khẩu thất bại");
+            throw new RuntimeException(EnumConfig.CHANGE_ERROR.getText());
         }
 
         // Đổi mật khẩu và lưu lại
