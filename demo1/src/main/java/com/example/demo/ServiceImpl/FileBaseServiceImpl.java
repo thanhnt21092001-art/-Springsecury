@@ -3,11 +3,17 @@ package com.example.demo.ServiceImpl;
 import com.example.demo.Entities.FileBase;
 import com.example.demo.Repository.FileBaseReposity;
 import com.example.demo.Service.FileBaseSerVice;
+import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
+import com.google.firebase.cloud.StorageClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 @Service
 public class FileBaseServiceImpl implements FileBaseSerVice {
@@ -34,6 +40,19 @@ public class FileBaseServiceImpl implements FileBaseSerVice {
         BlobId blobId = BlobId.of(bucketName, objectName);
         storage.delete(blobId);
         fileBaseReposity.deleteById(Math.toIntExact(id));
+    }
+    @Override
+    public byte[] downloadFileAsBytes(String filePath) throws IOException {
+        Bucket bucket = StorageClient.getInstance().bucket();
+        Blob blob = bucket.get(filePath);
+
+        if (blob == null) {
+            throw new IOException("File not found: " + filePath);
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        blob.downloadTo(outputStream);
+        return outputStream.toByteArray();
     }
 
 

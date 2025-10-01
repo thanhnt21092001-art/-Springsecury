@@ -15,7 +15,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("API Demo")
                         .version("v1.0")
-                        .description("Mô tả API của bạn"));
+                        .description("Tài liệu API "));
     }
 }
 

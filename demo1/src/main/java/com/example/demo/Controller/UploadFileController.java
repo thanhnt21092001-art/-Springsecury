@@ -7,6 +7,9 @@ import com.google.cloud.storage.Blob;
 import com.google.firebase.cloud.StorageClient;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,9 +36,9 @@ public class UploadFileController {
                     file.getContentType()
             );
             FileBase fileBase = new FileBase();
-            URL url = StorageClient.getInstance().bucket().getStorage()
+            StorageClient.getInstance().bucket().getStorage()
                     .signUrl(blob, 7, TimeUnit.DAYS);
-            fileBase.setFilePath(url.toString());
+            fileBase.setFilePath("uploads/" + file.getOriginalFilename());
             fileBase.setFileName(file.getOriginalFilename());
             fileBase.setFileType(file.getContentType());
             fileBase.setFileSize(String.valueOf(file.getSize()));
@@ -56,6 +59,26 @@ public class UploadFileController {
         map.put("message", EnumConfig.MESSAGE_DELETE_FILE.getText());
         return ResponseEntity.ok(map);
 
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam String path) {
+        try {
+            byte[] data = fileBaseSerVice.downloadFileAsBytes(path);
+            ByteArrayResource resource = new ByteArrayResource(data);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + extractFileName(path) + "\"")
+                    .contentLength(data.length)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(null);
+        }
+    }
+
+    private String extractFileName(String fullPath) {
+        return fullPath.contains("/") ? fullPath.substring(fullPath.lastIndexOf("/") + 1) : fullPath;
     }
 
 
