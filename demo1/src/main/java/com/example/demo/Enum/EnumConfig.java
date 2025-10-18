@@ -21,7 +21,7 @@ public enum EnumConfig {
         messages.put(LOCK, "Khóa thành công");
         messages.put(FAIL, "Fail");
         messages.put(ACCESS_DENIED, "Access Denied");
-        messages.put(ERROR, "Error");
+        messages.put(ERROR, "ERROR");
         messages.put(TOKEN_FAIL, "Invalid or missing token");
         messages.put(TOKEN_RECALL, "User đã bị khóa");
         messages.put(INVALID_TOKEN, "Invalid token");

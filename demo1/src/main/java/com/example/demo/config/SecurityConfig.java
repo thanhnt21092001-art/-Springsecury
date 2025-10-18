@@ -1,8 +1,11 @@
 package com.example.demo.config;
 
+import com.example.demo.Enum.EnumConfig;
 import com.example.demo.Service.TokenBlacklistService;
 import com.example.demo.ServiceImpl.UserDetailService;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,6 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -31,6 +37,7 @@ public class SecurityConfig {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
         this.tokenBlacklistService = tokenBlacklistService;
+
     }
 
     @Bean
@@ -62,6 +69,20 @@ public class SecurityConfig {
         http.addFilterBefore(
                 new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService, tokenBlacklistService),
                 UsernamePasswordAuthenticationFilter.class
+        ).exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    if (response.getStatus() == HttpServletResponse.SC_NOT_FOUND) {
+                        response.setContentType("application/json;charset=UTF-8");
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("code", HttpServletResponse.SC_NOT_FOUND);
+                        map.put("status", EnumConfig.ERROR);
+                        map.put("message","Not found");
+                        ObjectMapper mapper = new ObjectMapper();
+                        response.getWriter().write(mapper.writeValueAsString(map));
+                    } else {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    }
+                })
         );
 
         return http.build();
