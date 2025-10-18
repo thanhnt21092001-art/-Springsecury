@@ -70,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 handleUnauthorizedResponse(response, EnumConfig.TOKEN_FAIL.getText());
             }
         } catch (RuntimeException e) {
-            handleUnauthorizedResponse(response, EnumConfig.LOGIN_FAIL.getText() + e.getMessage());
+            handleUnauthorizedResponse(response, e.getMessage());
         } catch (Exception e) {
             handleInternalServerError(response, e.getMessage());
         }
