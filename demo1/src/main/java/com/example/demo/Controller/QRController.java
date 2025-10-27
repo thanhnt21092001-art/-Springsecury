@@ -27,12 +27,11 @@ public class QRController {
     public ResponseEntity<byte[]> generateQRImage(
             @RequestParam String acquierID,
             @RequestParam String consumerID,
-            @RequestParam String amount,
+//            @RequestParam String amount,
             @RequestParam(required = false, defaultValue = "QRIBFTTA") String note
     ) throws Exception {
         String qrText = qrService
                 .setBeneficiaryOrganization(acquierID, consumerID)
-                .setTransactionAmount(amount)
                 .setAdditionalDataFieldTemplate(note)
                 .build();
 
