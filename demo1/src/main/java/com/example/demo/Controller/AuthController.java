@@ -114,6 +114,14 @@ public class AuthController {
             hashMap.put("id", user.getId());
             hashMap.put("username", user.getUsername());
             hashMap.put("role", user.getRole());
+            hashMap.put("email", user.getEmail());
+            String status;
+            if("1".equals(user.isEnabled())){
+                status = "unlocked";
+            }else {
+                status = "locked";
+            }
+            hashMap.put("status", status);
             list.add(hashMap);
         }
         map.put("status", EnumConfig.SUCCESS.getText());
