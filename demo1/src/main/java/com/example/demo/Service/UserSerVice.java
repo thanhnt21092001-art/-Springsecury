@@ -3,6 +3,8 @@ package com.example.demo.Service;
 import com.example.demo.Entities.User;
 import com.example.demo.dto.ChangePassSetRoleAdmin;
 import com.example.demo.dto.ChangePasswordRequest;
+import com.example.demo.dto.ForgetDTO;
+import jakarta.mail.MessagingException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +16,6 @@ public interface UserSerVice  {
     User registerUser(User request);
     void SaveOrUpdate(Long id , Boolean enalbe);
     String changePassword(ChangePasswordRequest request);
-
+    String forGetPassword(ForgetDTO request) throws MessagingException;
     String changePasswordByUserName(ChangePassSetRoleAdmin request);
 }

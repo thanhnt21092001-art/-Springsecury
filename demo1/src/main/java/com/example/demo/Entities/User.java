@@ -32,4 +32,7 @@ public class User {
     @Column(unique = true)
     private Date create_date;
 
+    @Column (unique = false)
+    private String email;
+
 }

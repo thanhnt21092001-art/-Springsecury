@@ -6,10 +6,8 @@ import com.example.demo.Service.TokenBlacklistService;
 import com.example.demo.Service.UserSerVice;
 import com.example.demo.ServiceImpl.UserDetailService;
 import com.example.demo.config.JwtTokenProvider;
-import com.example.demo.dto.ChangePassSetRoleAdmin;
-import com.example.demo.dto.ChangePasswordRequest;
-import com.example.demo.dto.LoginDTO;
-import com.example.demo.dto.RegisterDTO;
+import com.example.demo.dto.*;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +69,21 @@ public class AuthController {
 
     }
 
+    @PostMapping("/forgetpassword")
+    public  ResponseEntity<?> forgetPass (@RequestBody ForgetDTO dto) throws MessagingException {
+        Map<String, String> map = new HashMap<>();
+        try {
+            userSerVice.forGetPassword(dto);
+            map.put("message", "Mật khẩu đã gửi về email của bạn");
+            map.put("code", String.valueOf(HttpServletResponse.SC_OK));
+            return ResponseEntity.ok(map);
+        }catch (RuntimeException e) {
+            map.put("error", "Lỗi không gửi được !");
+            map.put("code", String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
+            return ResponseEntity.badRequest().body(map);
+        }
+
+    }
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterDTO request) {
         HashMap<String, Object> map = new HashMap<>();
