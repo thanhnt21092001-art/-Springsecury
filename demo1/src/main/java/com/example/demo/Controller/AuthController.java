@@ -78,8 +78,8 @@ public class AuthController {
             map.put("code", String.valueOf(HttpServletResponse.SC_OK));
             return ResponseEntity.ok(map);
         }catch (RuntimeException e) {
-            map.put("error", "Lỗi không gửi được !");
-            map.put("code", String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
+            map.put("error", e.getMessage());
+            map.put("code", String.valueOf(HttpServletResponse.SC_BAD_REQUEST));
             return ResponseEntity.badRequest().body(map);
         }
 
