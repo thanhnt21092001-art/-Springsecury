@@ -9,13 +9,10 @@ import com.example.demo.dto.ChangePassSetRoleAdmin;
 import com.example.demo.dto.ChangePasswordRequest;
 import com.example.demo.dto.ForgetDTO;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletResponse;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
@@ -90,7 +87,7 @@ public class UserServiceImpl implements UserSerVice {
 
     @Override
     public String forGetPassword(ForgetDTO request) throws MessagingException {
-        String username =request.getUsername();
+        String username = request.getUsername();
         Optional<User> optionalUser = userRepository.findByUsername(username);
 
         if (optionalUser.isEmpty()) {
@@ -101,6 +98,13 @@ public class UserServiceImpl implements UserSerVice {
         if (optionalUser.isEmpty()) {
             throw new RuntimeException(EnumConfig.NOT_FOUND_USER.getText());
         }
+        if (user.getDate_end() != null && user.getDate_end().before(new java.util.Date())) {
+            throw new RuntimeException(EnumConfig.USER_EXPIRED.getText());
+        }
+        Boolean checkLockUnlock = user.isEnabled();
+        if (!checkLockUnlock) {
+            throw new RuntimeException(EnumConfig.TOKEN_RECALL.getText());
+        }
         String email = user.getEmail();
         // generate password mới random
         String newPassword = generateRandomPassword();
@@ -109,7 +113,7 @@ public class UserServiceImpl implements UserSerVice {
         user.setPassword(passwordEncoder.encode(newPassword));
 
         userRepository.save(user);
-        sendPasswordEmail(username,email,newPassword);
+        sendPasswordEmail(username, email, newPassword);
         // gửi email
         userRepository.save(user);
         return EnumConfig.PASSWORD_CHANGE_SUCCESS.getText();
