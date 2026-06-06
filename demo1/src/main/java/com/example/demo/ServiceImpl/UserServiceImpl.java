@@ -10,9 +10,11 @@ import com.example.demo.dto.ChangePasswordRequest;
 import com.example.demo.dto.ForgetDTO;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
@@ -26,6 +28,9 @@ public class UserServiceImpl implements UserSerVice {
 
     @Autowired
     private EmailService emailService;
+
+    @Value("${keypass}")
+    private String keyPassword;
 
     public void UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -148,14 +153,13 @@ public class UserServiceImpl implements UserSerVice {
     }
 
     private String generateRandomPassword() {
-        String chars =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$";
+        String chars = keyPassword;
 
         StringBuilder password = new StringBuilder();
 
         Random random = new Random();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 12; i++) {
             password.append(chars.charAt(random.nextInt(chars.length())));
         }
 
