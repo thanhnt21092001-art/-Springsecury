@@ -1,7 +1,9 @@
 package com.example.demo.ServiceImpl;
 
+import com.example.demo.Entities.OtpEntity;
 import com.example.demo.Entities.User;
 import com.example.demo.Enum.EnumConfig;
+import com.example.demo.Repository.OtpRepository;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.EmailService;
 import com.example.demo.Service.UserSerVice;
@@ -9,14 +11,21 @@ import com.example.demo.dto.ChangePassSetRoleAdmin;
 import com.example.demo.dto.ChangePasswordRequest;
 import com.example.demo.dto.ForgetDTO;
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -28,6 +37,9 @@ public class UserServiceImpl implements UserSerVice {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private OtpRepository  otpRepository;
 
     @Value("${keypass}")
     private String keyPassword;
@@ -54,6 +66,7 @@ public class UserServiceImpl implements UserSerVice {
         user.setCreate_date(new Date(System.currentTimeMillis()));
         user.setDate_end(Date.valueOf(LocalDate.now().plusDays(30)));
         user.setEnabled(true);// default role
+        user.setRequireOtp(false);
         return userRepository.save(user);
     }
 
@@ -175,5 +188,97 @@ public class UserServiceImpl implements UserSerVice {
         return EnumConfig.PASSWORD_CHANGE_SUCCESS.getText();
     }
 
+    private String generateOtp() {
+        String chars = "0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder otp = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            otp.append(
+                    chars.charAt(
+                            random.nextInt(
+                                    chars.length()
+                            )
+                    )
+            );
+        }
+        return otp.toString();
+    }
 
+    public void sendOtp(String email, String userName) throws MessagingException {
+        String otp = generateOtp();
+        sendOtpData(email,otp);
+        String html = """
+                <html>
+                    <body style="font-family: Arial, sans-serif;">
+                        <h2>Xin chào %s,</h2>
+                
+                        <p>Mã xác thực của bạn là :</p>
+                
+                        <div style="
+                            background-color:#f4f4f4;
+                            padding:15px;
+                            border-radius:8px;
+                            font-size:20px;
+                            font-weight:bold;
+                            width:fit-content;">
+                            %s
+                        </div>
+                    </body>
+                </html>
+                """.formatted(userName, otp);
+        emailService.sendHtmlMail(email, "", html);
+
+
+    }
+
+    @Transactional
+    private void sendOtpData(
+            String email ,String otp
+    ) throws MessagingException {
+
+        OtpEntity otpEntity = new OtpEntity();
+        otpEntity.setEmail(email);
+        otpEntity.setOtp(otp);
+        otpEntity.setExpiredAt(
+                LocalDateTime.now()
+                        .plusMinutes(5)
+        );
+
+        otpEntity.setUsed(false);
+        otpRepository.save(otpEntity);
+    }
+
+    public UserDetails loadUserByUsername(
+            String username
+    ) throws UsernameNotFoundException {
+
+        User user =
+                userRepository
+                        .findByUsername(
+                                username
+                        )
+                        .orElseThrow(() ->
+                                new UsernameNotFoundException(
+                                        "User not found"
+                                ));
+
+        List<GrantedAuthority>
+                authorities =
+                List.of(
+                        new SimpleGrantedAuthority(
+                                "ROLE_" +
+                                        user.getRole()
+                        )
+                );
+
+        return new org.springframework
+                .security
+                .core
+                .userdetails
+                .User(
+                user.getUsername(),
+                user.getPassword(),
+                authorities
+        );
+    }
 }

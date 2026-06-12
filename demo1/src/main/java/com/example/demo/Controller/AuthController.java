@@ -2,6 +2,8 @@ package com.example.demo.Controller;
 
 import com.example.demo.Entities.User;
 import com.example.demo.Enum.EnumConfig;
+import com.example.demo.Repository.UserRepository;
+import com.example.demo.Service.OtpService;
 import com.example.demo.Service.TokenBlacklistService;
 import com.example.demo.Service.UserSerVice;
 import com.example.demo.ServiceImpl.UserDetailService;
@@ -17,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,58 +35,40 @@ public class AuthController {
     private final UserDetailService userDetailsService;
     private final UserSerVice userSerVice;
     private final TokenBlacklistService tokenBlacklistService;
+    private final OtpService otpService;
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     public AuthController(AuthenticationManager authManager, JwtTokenProvider jwtTokenProvider,
-                          UserDetailService userDetailsService, UserSerVice userSerVice, TokenBlacklistService tokenBlacklistService) {
+                          UserDetailService userDetailsService, UserSerVice userSerVice, TokenBlacklistService tokenBlacklistService, OtpService otpService) {
         this.authenticationManager = authManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
         this.userSerVice = userSerVice;
         this.tokenBlacklistService = tokenBlacklistService;
+        this.otpService = otpService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO request) {
-        Map<String, String> map = new HashMap<>();
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getUsername(), request.getPassword()
-                    )
-            );
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = jwtTokenProvider.generateToken(String.valueOf(authentication));
-            map.put("error", "Success");
-            map.put("code", String.valueOf(HttpServletResponse.SC_OK));
-            map.put("token", token);
-            return ResponseEntity.ok(map);
-        } catch (RuntimeException e) {
-            map.put("error", EnumConfig.ERROR.getText());
-            map.put("message", e.getMessage());
-            map.put("code", String.valueOf(HttpServletResponse.SC_BAD_REQUEST));
-            return ResponseEntity.badRequest().body(map);
-        }
-
-    }
 
     @PostMapping("/forgetpassword")
-    public  ResponseEntity<?> forgetPass (@RequestBody ForgetDTO dto) throws MessagingException {
+    public ResponseEntity<?> forgetPass(@RequestBody ForgetDTO dto) throws MessagingException {
         Map<String, String> map = new HashMap<>();
         try {
             userSerVice.forGetPassword(dto);
             map.put("message", "Mật khẩu đã gửi về email của bạn");
             map.put("code", String.valueOf(HttpServletResponse.SC_OK));
             return ResponseEntity.ok(map);
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             map.put("error", e.getMessage());
             map.put("code", String.valueOf(HttpServletResponse.SC_BAD_REQUEST));
             return ResponseEntity.badRequest().body(map);
         }
 
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterDTO request) {
         HashMap<String, Object> map = new HashMap<>();
@@ -116,9 +101,9 @@ public class AuthController {
             hashMap.put("role", user.getRole());
             hashMap.put("email", user.getEmail());
             String status;
-            if("1".equals(user.isEnabled())){
+            if ("1".equals(user.isEnabled())) {
                 status = "unlocked";
-            }else {
+            } else {
                 status = "locked";
             }
             hashMap.put("status", status);
@@ -183,6 +168,141 @@ public class AuthController {
         map.put("code", HttpServletResponse.SC_OK);
         map.put("message", message);
         return ResponseEntity.ok(map);
+    }
+
+    @PostMapping("/verify-login-otp")
+    public ResponseEntity<?> verifyLoginOtp(
+            @RequestBody VerifyOtpDTO request
+    ) {
+
+        Map<String, Object> map =
+                new HashMap<>();
+
+        try {
+
+            User user =
+                    userRepository
+                            .findByUsername(
+                                    request.getUsername()
+                            )
+                            .orElseThrow(() ->
+                                    new RuntimeException(
+                                            "User not found"
+                                    ));
+
+            otpService.verifyOtp(
+                    user.getEmail(),
+                    request.getOtp()
+            );
+            UserDetails userDetails =
+                    userSerVice
+                            .loadUserByUsername(
+                                    user.getUsername()
+                            );
+
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+
+            String token =
+                    jwtTokenProvider.generateToken(
+                            String.valueOf(authentication)
+                    );
+
+            map.put("message", "Success");
+            map.put("token", token);
+            map.put(
+                    "code",
+                    HttpServletResponse.SC_OK
+            );
+
+            return ResponseEntity.ok(map);
+
+        } catch (Exception e) {
+
+            map.put(
+                    "error",
+                    EnumConfig.ERROR.getText()
+            );
+
+            map.put(
+                    "message",
+                    e.getMessage()
+            );
+
+            map.put(
+                    "code",
+                    HttpServletResponse.SC_BAD_REQUEST
+            );
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(map);
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginDTO request) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(), request.getPassword()
+                    )
+            );
+            User user =
+                    userRepository
+                            .findByUsername(
+                                    request.getUsername()
+                            )
+                            .orElseThrow(() ->
+                                    new RuntimeException(
+                                            "User not found"
+                                    ));
+
+            // check user có bật OTP không
+            if (Boolean.TRUE.equals(
+                    user.getRequireOtp()
+            )) {
+                // gửi OTP login
+                userSerVice.sendOtp(
+                        user.getEmail() , user.getUsername()
+                );
+                map.put(
+                        "message",
+                        "OTP đã gửi về email"
+                );
+                map.put(
+                        "requireOtp",
+                        String.valueOf(true)
+                );
+                map.put(
+                        "code",
+                        String.valueOf(HttpServletResponse.SC_OK)
+                );
+
+                return ResponseEntity.ok(
+                        map
+                );
+            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = jwtTokenProvider.generateToken(String.valueOf(authentication));
+            map.put("error", "Success");
+            map.put("code", String.valueOf(HttpServletResponse.SC_OK));
+            map.put("token", token);
+            return ResponseEntity.ok(map);
+        } catch (RuntimeException e) {
+            map.put("error", EnumConfig.ERROR.getText());
+            map.put("message", e.getMessage());
+            map.put("code", String.valueOf(HttpServletResponse.SC_BAD_REQUEST));
+            return ResponseEntity.badRequest().body(map);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 }

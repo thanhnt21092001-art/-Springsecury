@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/forgetpassword").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/verify-login-otp").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/lockAndUnlock").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/auth/getAll").hasAuthority("ROLE_ADMIN")

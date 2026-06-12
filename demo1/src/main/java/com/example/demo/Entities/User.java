@@ -35,4 +35,7 @@ public class User {
     @Column (unique = false)
     private String email;
 
+    @Column(name = "require_otp")
+    private Boolean requireOtp = false;
+
 }

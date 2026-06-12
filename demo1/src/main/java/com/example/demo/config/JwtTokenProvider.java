@@ -46,6 +46,21 @@ public class JwtTokenProvider {
 
 
     }
+   public String tokenData (String username) {
+       User user = userRepository.findByUsername(username).orElseThrow();
+       if (!user.isEnabled()) {
+           throw new RuntimeException(EnumConfig.TOKEN_RECALL.getText());
+       }
+
+       Date now = new Date();
+       Date expiry = new Date(now.getTime() + validityInMs);
+       return Jwts.builder()
+               .setSubject(username)
+               .setIssuedAt(now)
+               .setExpiration(expiry)
+               .signWith(key)
+               .compact();
+    }
 
     public boolean validateToken(String token) {
         try {
