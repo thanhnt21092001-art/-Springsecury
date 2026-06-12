@@ -29,12 +29,18 @@ public class OtpServiceImpl implements OtpService {
                                 new RuntimeException(
                                         "Không tìm thấy OTP"
                                 ));
-
+        System.out.println(otpEntity.getOtp());
         // check đã dùng chưa
         if (Boolean.TRUE.equals(
                 otpEntity.getUsed()
         )) {
+            if (!otpEntity.getOtp()
+                    .equals(otp)) {
 
+                throw new RuntimeException(
+                        "OTP không đúng"
+                );
+            }
             throw new RuntimeException(
                     "OTP đã được sử dụng"
             );
