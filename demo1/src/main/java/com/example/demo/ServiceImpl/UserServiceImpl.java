@@ -26,6 +26,7 @@ import java.security.SecureRandom;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -240,8 +241,7 @@ public class UserServiceImpl implements UserSerVice {
         otpEntity.setEmail(email);
         otpEntity.setOtp(otp);
         otpEntity.setExpiredAt(
-                LocalDateTime.now()
-                        .plusMinutes(5)
+                LocalDateTime.now().plusMinutes(5)
         );
 
         otpEntity.setUsed(false);
