@@ -17,4 +17,5 @@ RUN mkdir -p /app/credentials
 # copy firebase json vào linux path
 COPY image-1acd5-firebase-adminsdk-eqvw5-a3fa3e0e84.json /app/credentials/firebase.json
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENV TZ=Asia/Ho_Chi_Minh
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Ho_Chi_Minh", "-jar", "app.jar"]

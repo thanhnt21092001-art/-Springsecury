@@ -6,7 +6,7 @@ import java.util.Map;
 public enum EnumConfig {
     PASSWORD_CHANGE_SUCCESS, LOGIN_FAIL, VALIDATE, LOGOUT_MESSAGE, SUCCESS, LOCK, UNLOCK, FAIL, ACCESS_DENIED, ERROR,
     TOKEN_FAIL, TOKEN_RECALL, INVALID_TOKEN, NOT_FOUND_USER, USER_EXPIRED, MESSAGE_DELETE_FILE, MESSAGE_UPLOAD_FILE,ROLE_USER,
-    INVALID_USER_PASS,CHANGE_ERROR;
+    INVALID_USER_PASS,CHANGE_ERROR,ERRORLOGIN;
 
 
     private static final Map<EnumConfig, String> messages = new HashMap<>();
@@ -22,6 +22,7 @@ public enum EnumConfig {
         messages.put(FAIL, "Fail");
         messages.put(ACCESS_DENIED, "Access Denied");
         messages.put(ERROR, "ERROR");
+        messages.put(ERRORLOGIN, "Thông tin không chính xác");
         messages.put(TOKEN_FAIL, "Invalid or missing token");
         messages.put(TOKEN_RECALL, "User đã bị khóa");
         messages.put(INVALID_TOKEN, "Invalid token");

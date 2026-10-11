@@ -12,6 +12,7 @@ import com.example.demo.dto.*;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -295,8 +297,8 @@ public class AuthController {
             map.put("token", token);
             return ResponseEntity.ok(map);
         } catch (RuntimeException e) {
-            map.put("error", EnumConfig.ERROR.getText());
-            map.put("message", e.getMessage());
+            log.error("Lỗi : " + e.getMessage());
+            map.put("error", EnumConfig.ERRORLOGIN.getText());
             map.put("code", String.valueOf(HttpServletResponse.SC_BAD_REQUEST));
             return ResponseEntity.badRequest().body(map);
         } catch (MessagingException e) {
