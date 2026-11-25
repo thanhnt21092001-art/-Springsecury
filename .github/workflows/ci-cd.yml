@@ -31,15 +31,15 @@ jobs:
           cache: maven
 
       - name: Build and install with Maven
-        shell: powershell
+        shell: cmd
         run: .\mvnw.cmd -B clean install
 
       - name: Build Docker image
-        shell: powershell
+        shell: cmd
         run: docker build -t demo:latest .
 
       - name: Deploy container locally
-        shell: powershell
+        shell: cmd
         run: |
           if ([string]::IsNullOrWhiteSpace($env:FIREBASE_CREDENTIALS_PATH)) {
             throw "Set FIREBASE_CREDENTIALS_PATH on the self-hosted runner to the local Firebase service-account JSON file."
