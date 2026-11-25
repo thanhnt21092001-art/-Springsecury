@@ -1,0 +1,7 @@
+.git
+.idea
+logs/
+*.tar
+image-*.json
+target/*
+!target/demo1-0.0.1-SNAPSHOT.jar
