@@ -32,7 +32,7 @@ jobs:
 
       - name: Build and install with Maven
         shell: powershell
-        run: mvnw.cmd -B clean install
+        run: .\mvnw.cmd -B clean install
 
       - name: Build Docker image
         shell: powershell
