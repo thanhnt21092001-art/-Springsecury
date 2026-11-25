@@ -31,38 +31,30 @@ jobs:
           cache: maven
 
       - name: Build and install with Maven
-        shell: powershell
-        run: .\mvnw.cmd -B clean install
+        shell: cmd
+        run: mvnw.cmd -B clean install
 
       - name: Build Docker image
-        shell: powershell
+        shell: cmd
         run: docker build -t demo:latest .
 
       - name: Deploy container locally
-        shell: powershell
+        shell: cmd
         run: |
-          if ([string]::IsNullOrWhiteSpace($env:FIREBASE_CREDENTIALS_PATH)) {
-            throw "Set FIREBASE_CREDENTIALS_PATH on the self-hosted runner to the local Firebase service-account JSON file."
-          }
-          if (-not (Test-Path -LiteralPath $env:FIREBASE_CREDENTIALS_PATH -PathType Leaf)) {
-            throw "Firebase credentials file not found at FIREBASE_CREDENTIALS_PATH."
-          }
+          if not defined FIREBASE_CREDENTIALS_PATH (
+            echo Set FIREBASE_CREDENTIALS_PATH on the self-hosted runner.
+            exit /b 1
+          )
+          if not exist "%FIREBASE_CREDENTIALS_PATH%" (
+            echo Firebase credentials file not found.
+            exit /b 1
+          )
 
-          docker container inspect demo *> $null
-          if ($LASTEXITCODE -eq 0) {
+          docker container inspect demo >nul 2>&1
+          if not errorlevel 1 (
             docker rm -f demo
-            if ($LASTEXITCODE -ne 0) {
-              throw "Could not remove the existing demo container."
-            }
+            if errorlevel 1 exit /b 1
           }
 
-          docker run -d `
-            --name demo `
-            --restart unless-stopped `
-            -p 9999:9999 `
-            -e SPRING_PROFILES_ACTIVE=uat `
-            --mount "type=bind,source=$($env:FIREBASE_CREDENTIALS_PATH),target=/app/credentials/firebase.json,readonly" `
-            demo:latest
-          if ($LASTEXITCODE -ne 0) {
-            throw "Could not start the demo container."
-          }
+          docker run -d --name demo --restart unless-stopped -p 9999:9999 -e SPRING_PROFILES_ACTIVE=uat --mount "type=bind,source=%FIREBASE_CREDENTIALS_PATH%,target=/app/credentials/firebase.json,readonly" demo:latest
+          if errorlevel 1 exit /b 1
